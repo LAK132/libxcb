@@ -54,6 +54,7 @@ PKG_CHECK_MODULES(XCBPROTO, xcb-proto >= 1.14)
 NEEDED="xau >= 0.99.2"
 case $host_os in
 linux*) ;;
+cygwin*) ;;
      *) NEEDED="$NEEDED pthread-stubs" ;;
 esac
 PKG_CHECK_MODULES(NEEDED, $NEEDED)
@@ -79,6 +80,8 @@ AC_MSG_CHECKING(XCBPROTO_XCBINCLUDEDIR)
 XCBPROTO_XCBINCLUDEDIR=`$PKG_CONFIG --variable=xcbincludedir xcb-proto`
 AC_MSG_RESULT($XCBPROTO_XCBINCLUDEDIR)
 AC_SUBST(XCBPROTO_XCBINCLUDEDIR)
+# :TODO: Under cygwin this generates something like `//usr/share/xcb` when it
+# should be `/usr/local/share/xcb`
 
 # Find the xcb-proto version
 XCBPROTO_VERSION=`$PKG_CONFIG --modversion xcb-proto`
@@ -89,6 +92,9 @@ AC_MSG_CHECKING(XCBPROTO_XCBPYTHONDIR)
 XCBPROTO_XCBPYTHONDIR=`$PKG_CONFIG --variable=pythondir xcb-proto`
 AC_MSG_RESULT($XCBPROTO_XCBPYTHONDIR)
 AC_SUBST(XCBPROTO_XCBPYTHONDIR)
+# :TODO: Under cygwin this generates something like
+# `//usr/lib/python3.6/site-packages` when it should be
+# `/usr/lib/python3.6/site-packages`
 
 AC_HEADER_STDC
 AC_SEARCH_LIBS(getaddrinfo, socket)
@@ -140,7 +146,7 @@ esac
 have_win32="no"
 lt_enable_auto_import=""
 case $host_os in
-mingw*)
+cygwin*|mingw*)
         have_win32="yes"
         lt_enable_auto_import="-Wl,--enable-auto-import"
         ;;
@@ -212,7 +218,7 @@ esac
 
 dnl Link with winsock for socket functions on MinGW
 case $host_os in
-        *mingw*)
+        cygwin*|*mingw*)
                 AC_CHECK_LIB([ws2_32],[main])
                 ;;
         *)
